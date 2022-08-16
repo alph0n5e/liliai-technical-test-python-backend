@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  app:
+    build: ./app/
+    ports:
+      - "3000:3000"
+    environment:
+      - FLASK_APP=./app.py
+    depends_on:
+      - redis-queue
+  
+  redis-logs:
+    image: "redis:alpine"
+  
+  redis-queue:
+    image: "redis:alpine"
+  
+  celery-worker:
+    build:
+      context: ./app/
+    environment:
+      - FLASK_APP=./app.py
+    command: celery -A app.celery worker --loglevel=info
+    depends_on:
+      - redis-queue
+      - redis-logs

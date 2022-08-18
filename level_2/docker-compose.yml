@@ -20,7 +20,7 @@ services:
       context: ./app/
     environment:
       - FLASK_APP=./app.py
-    command: celery -A app.celery worker --loglevel=info
+    command: celery -A app.celery worker --loglevel=debug
     depends_on:
       - redis-queue
       - redis-logs

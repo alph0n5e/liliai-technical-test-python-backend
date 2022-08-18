@@ -1,4 +1,5 @@
 import json
+import logging
 from flask import (
     Flask, 
     request
@@ -11,6 +12,8 @@ from lib.exceptions import LogException
 from lib.logs import (
     parse_log_to_dict,
 )
+
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 app.config.update(CELERY_CONFIG={
@@ -38,12 +41,11 @@ def process_and_store_log(
     """
     Process and Add Log to Redis List
     """
-    print(log)
-    print(redis_logs)
+    logging.debug(f"Input log: {log.get('id')}")
     enriched_log = {**log}
     compute(enriched_log)
-    print(enriched_log)
-    # client.lpush('Loglist', json.dumps(enriched_log))
+    redis_logs.lpush('Loglist', json.dumps(enriched_log))
+    logging.debug(f"Pushed enriched log {enriched_log.get('id')}")
 
 
 if __name__ == '__main__':
